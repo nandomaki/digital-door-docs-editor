@@ -229,7 +229,7 @@ export function PersonalAuthGate({
   authClient,
   baseUrl,
   onAuthenticated,
-  heading = 'Sign in to Casual Editor',
+  heading = 'Sign in to Digital Door Docs Editor',
   initialMode = 'login',
 }: PersonalAuthGateProps) {
   const { state, login, signup, logout } = usePersonalAuth({

@@ -854,26 +854,8 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
         <div style={styles.brandRow}>
           <img src="/logo.svg" alt="" style={styles.brandLogo} aria-hidden="true" />
           <div style={styles.brandName}>
-            Casual <span style={{ color: COLORS.brand }}>Editor</span>
+            Digital Door <span style={{ color: COLORS.brand }}>Docs Editor</span>
           </div>
-        </div>
-        <div style={styles.topRight}>
-          <a
-            href="https://github.com/schnsrw/docx"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={styles.topLink}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = COLORS.ink;
-              e.currentTarget.style.background = COLORS.surface2;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = COLORS.inkMuted;
-              e.currentTarget.style.background = 'transparent';
-            }}
-          >
-            GitHub
-          </a>
         </div>
       </header>
 
@@ -887,7 +869,7 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
       />
 
       <section style={{ ...styles.hero, ...(isMobile && mobile.hero) }}>
-        <div style={styles.heroEyebrow}>Casual Editor</div>
+        <div style={styles.heroEyebrow}>Digital Door Docs Editor</div>
         <h1 style={{ ...styles.heroTitle, ...(isMobile && mobile.heroTitle) }}>
           Start something today.
         </h1>
@@ -1130,37 +1112,11 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
             rewrite panel, and a DocOps chat panel. On-device in the desktop app, or the Anthropic
             API on the web.
           </span>
-          <a
-            href="https://github.com/CasualOffice/docs#ai-features-pre-release"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              marginLeft: 'auto',
-              fontSize: '13px',
-              fontWeight: 600,
-              color: '#1d4ed8',
-              textDecoration: 'none',
-              whiteSpace: 'nowrap',
-              flexShrink: 0,
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-            onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
-          >
-            Learn more
-          </a>
         </div>
       </section>
 
       <footer style={{ ...styles.footer, ...(isMobile && mobile.footer) }}>
-        <span>MIT fork of eigenpal/docx-editor · Node collab server (Hocuspocus + Yjs)</span>
-        <a
-          href="https://github.com/schnsrw/docx"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: COLORS.inkMuted, textDecoration: 'none' }}
-        >
-          schnsrw/docx
-        </a>
+        <span>Digital Door Tecnologia</span>
       </footer>
     </div>
   );

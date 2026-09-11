@@ -2993,9 +2993,6 @@ export const DocxEditor = forwardRef<DocxEditorRef, DocxEditorProps>(function Do
   const showAbout = dialogs.isOpen('about');
   const setShowAbout = (v: boolean) => (v ? dialogs.open('about') : dialogs.close('about'));
   const handleShowAbout = useCallback(() => setShowAbout(true), []);
-  const handleReportBug = useCallback(() => {
-    void import('./report-bug').then((m) => m.openBugReport());
-  }, []);
 
   // Command palette state (⌘⇧P / Ctrl+Shift+P). Searchable list of every
   // menu action, sourced from the same callbacks the menus use.
@@ -9673,7 +9670,7 @@ export const DocxEditor = forwardRef<DocxEditorRef, DocxEditorProps>(function Do
                             onExportOdt={handleExportOdt}
                             onExportMd={handleExportMd}
                             /* Branding/support entries the host owns in embedded. */
-                            onReportBug={appShellHidden ? undefined : handleReportBug}
+                            onReportBug={undefined}
                             onConvertSelectionToTable={handleConvertSelectionToTable}
                             onConvertTableToText={
                               state.pmTableContext?.isInTable ? handleConvertTableToText : undefined
@@ -11874,14 +11871,8 @@ export const DocxEditor = forwardRef<DocxEditorRef, DocxEditorProps>(function Do
                       },
 
                       {
-                        id: 'help.report',
-                        label: 'Report a bug',
-                        path: 'Help',
-                        run: handleReportBug,
-                      },
-                      {
                         id: 'help.about',
-                        label: 'About Casual Editor',
+                        label: 'About Digital Door Docs Editor',
                         path: 'Help',
                         run: handleShowAbout,
                       },

@@ -26,7 +26,6 @@ import { useDialogActions } from './DialogActionsContext';
 import { useViewState } from './ViewStateContext';
 import type { FormattingAction } from './Toolbar';
 import { useTranslation } from '../i18n';
-import { openReportIssue } from './reportIssue';
 
 // ============================================================================
 // Default Doc Icon (shown when no Logo is provided)
@@ -1107,11 +1106,15 @@ export function MenuBar() {
           { type: 'separator' as const } as MenuEntry,
         ]
       : []),
-    {
-      icon: 'bug_report',
-      label: t('toolbar.reportIssue'),
-      onClick: () => (onReportBug ? onReportBug() : openReportIssue()),
-    } as MenuEntry,
+    ...(onReportBug
+      ? [
+          {
+            icon: 'bug_report',
+            label: t('toolbar.reportIssue'),
+            onClick: onReportBug,
+          } as MenuEntry,
+        ]
+      : []),
     ...(onShowAbout
       ? [
           { type: 'separator' as const } as MenuEntry,

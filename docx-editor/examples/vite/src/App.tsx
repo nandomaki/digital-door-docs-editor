@@ -480,7 +480,7 @@ export function App() {
   // Browser tab title = the open file's name (Google-Docs style), not the
   // app name. On the home screen, fall back to the product name.
   useEffect(() => {
-    const APP_NAME = 'Casual Editor';
+    const APP_NAME = 'Digital Door Docs Editor';
     if (view === 'editor' && fileName) {
       const base = fileName.replace(/\.docx$/i, '').trim() || 'Untitled';
       document.title = `${base} — ${APP_NAME}`;
@@ -1311,7 +1311,7 @@ export function App() {
   const renderLogo = useCallback(() => {
     // In Casual Office the logo brings the launcher window forward rather
     // than navigating to a (nonexistent) web home, so label it accordingly.
-    const logoLabel = isDesktop ? 'Back to Casual Office' : 'Return to home';
+    const logoLabel = isDesktop ? 'Back to Digital Door Docs Editor' : 'Return to home';
     return (
       <button
         type="button"

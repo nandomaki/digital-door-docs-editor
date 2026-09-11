@@ -122,7 +122,7 @@ function CasualEditorLogo({ size = 56 }: { size?: number }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
-      aria-label="Casual Editor"
+      aria-label="Digital Door Docs Editor"
     >
       <rect width="64" height="64" rx="14" fill="#1a73e8" />
       <path d="M18 14 H42 L48 20 V50 H18 Z" fill="#ffffff" />
@@ -138,11 +138,13 @@ function CasualEditorLogo({ size = 56 }: { size?: number }) {
 export function AboutDialog({
   isOpen,
   onClose,
-  appName = 'Casual Editor',
-  sourceUrl = 'https://github.com/CasualOffice/docs',
-  homepageUrl = 'https://docs.casualoffice.org/',
+  appName = 'Digital Door Docs Editor',
+  sourceUrl = '',
+  homepageUrl = '',
 }: AboutDialogProps) {
   const year = new Date().getFullYear();
+  void sourceUrl;
+  void homepageUrl;
   return (
     <Dialog
       isOpen={isOpen}
@@ -162,58 +164,18 @@ export function AboutDialog({
         </div>
         <h3 style={productTitleStyle}>{appName}</h3>
         <p style={taglineStyle}>
-          A casual, real-time collaborative <code>.docx</code> editor.
-          <br />
-          Open it.{' '}
-          <a
-            href={homepageUrl}
-            onClick={(e) => {
-              e.preventDefault();
-              void openExternal(homepageUrl);
-            }}
-            style={linkStyle}
-          >
-            Try the live demo
-          </a>
-          .
+          Editor de documentos <code>.docx</code> com edição colaborativa em tempo real.
         </p>
         <dl style={factsStyle}>
           <dt style={dtStyle}>Version</dt>
           <dd style={ddStyle} data-testid="about-version">
             {APP_VERSION}
           </dd>
-          <dt style={dtStyle}>Source</dt>
-          <dd style={ddStyle}>
-            <a
-              href={sourceUrl}
-              onClick={(e) => {
-                e.preventDefault();
-                void openExternal(sourceUrl);
-              }}
-              style={linkStyle}
-            >
-              {sourceUrl.replace(/^https?:\/\//, '')}
-            </a>
-          </dd>
-          <dt style={dtStyle}>Engine</dt>
-          <dd style={ddStyle}>
-            Built on{' '}
-            <a
-              href="https://github.com/eigenpal/docx-editor"
-              onClick={(e) => {
-                e.preventDefault();
-                void openExternal('https://github.com/eigenpal/docx-editor');
-              }}
-              style={linkStyle}
-            >
-              eigenpal/docx-editor
-            </a>{' '}
-            (MIT)
-          </dd>
-          <dt style={dtStyle}>License</dt>
-          <dd style={ddStyle}>Apache-2.0</dd>
         </dl>
-        <p style={copyrightStyle}>© {year} Casual Office. Released under the Apache-2.0 license.</p>
+        <p style={copyrightStyle}>
+          © {year} Digital Door Tecnologia. Contém componentes de código aberto sob as licenças
+          Apache-2.0 e MIT.
+        </p>
       </div>
     </Dialog>
   );
