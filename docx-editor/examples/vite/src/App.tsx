@@ -10,7 +10,7 @@ import {
   createEmptyDocument,
   PresenceCluster,
 } from '@casualoffice/docs';
-import ptBR from '@casualoffice/docs/i18n/pt-BR.json';
+import ptBR from '../../../packages/react/i18n/pt-BR.json';
 import { useCollab } from './collab/useCollab';
 import { StatusBadge } from './collab/StatusBadge';
 import { ShareDialog } from './collab/Share';
