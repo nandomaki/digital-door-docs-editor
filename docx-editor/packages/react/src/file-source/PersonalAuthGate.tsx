@@ -229,7 +229,7 @@ export function PersonalAuthGate({
   authClient,
   baseUrl,
   onAuthenticated,
-  heading = 'Sign in to Digital Door Docs Editor',
+  heading = 'Entrar no Digital Door Docs Editor',
   initialMode = 'login',
 }: PersonalAuthGateProps) {
   const { state, login, signup, logout } = usePersonalAuth({
@@ -342,11 +342,11 @@ export function PersonalAuthGateModal({
         >
           {submitting
             ? mode === 'login'
-              ? 'Signing in…'
-              : 'Creating account…'
+              ? 'Entrando…'
+              : 'Criando conta…'
             : mode === 'login'
-              ? 'Sign in'
-              : 'Create account'}
+              ? 'Entrar'
+              : 'Criar conta'}
         </button>
       }
       helper={
@@ -359,7 +359,7 @@ export function PersonalAuthGateModal({
           data-testid="personal-auth-toggle"
           style={toggleButtonStyle}
         >
-          {mode === 'login' ? 'Create an account' : 'I already have an account'}
+          {mode === 'login' ? 'Criar uma conta' : 'Já tenho uma conta'}
         </button>
       }
     >
@@ -369,7 +369,7 @@ export function PersonalAuthGateModal({
         style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
       >
         <label style={labelStyle}>
-          <span style={labelTextStyle}>Username</span>
+          <span style={labelTextStyle}>Usuário</span>
           <input
             type="text"
             value={username}
@@ -385,7 +385,7 @@ export function PersonalAuthGateModal({
           />
         </label>
         <label style={labelStyle}>
-          <span style={labelTextStyle}>Password</span>
+          <span style={labelTextStyle}>Senha</span>
           <input
             type="password"
             value={password}
@@ -439,22 +439,22 @@ function humanReadable(err: PersonalFileSourceError): string {
   // the createUser / verifyLogin reasons in auth/personal.ts).
   switch (err.code) {
     case 'invalid-credentials':
-      return 'That username and password don’t match an account.';
+      return 'Usuário e senha não conferem.';
     case 'username-taken':
-      return 'That username is already taken. Try signing in.';
+      return 'Esse nome de usuário já está em uso. Tente entrar.';
     case 'invalid-username':
-      return 'That username isn’t allowed. Use letters, numbers, dot, dash or underscore.';
+      return 'Nome de usuário inválido. Use letras, números, ponto, hífen ou sublinhado.';
     case 'weak-password':
-      return 'Password must be at least 8 characters.';
+      return 'A senha precisa ter pelo menos 8 caracteres.';
     case 'signup-closed':
-      return 'Sign-ups are closed on this server. Ask the operator for an account.';
+      return 'Cadastros estão fechados neste servidor. Peça uma conta ao administrador.';
     case 'personal-mode-disabled':
     case 'mode-disabled':
-      return 'Accounts aren’t enabled on this server.';
+      return 'Contas não estão habilitadas neste servidor.';
     case 'bad-body':
-      return 'Please enter a username and password.';
+      return 'Informe usuário e senha.';
     default:
-      return err.message || 'Something went wrong. Please try again.';
+      return err.message || 'Algo deu errado. Tente de novo.';
   }
 }
 

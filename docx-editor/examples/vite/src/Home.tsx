@@ -553,9 +553,9 @@ function AutoReopenBanner({
       data-testid="auto-reopen-banner"
       style={autoReopenBannerStyle}
       role="region"
-      aria-label="Reopen last document"
+      aria-label="Reabrir último documento"
     >
-      <span style={{ fontSize: 13, color: COLORS.inkMuted }}>Pick up where you left off</span>
+      <span style={{ fontSize: 13, color: COLORS.inkMuted }}>Continue de onde parou</span>
       <strong
         data-testid="auto-reopen-banner-name"
         style={{ fontSize: 14, color: COLORS.ink, marginRight: 'auto' }}
@@ -568,7 +568,7 @@ function AutoReopenBanner({
         data-testid="auto-reopen-banner-dismiss"
         style={autoReopenBannerDismissStyle}
       >
-        Dismiss
+        Dispensar
       </button>
       <button
         type="button"
@@ -576,7 +576,7 @@ function AutoReopenBanner({
         data-testid="auto-reopen-banner-open"
         style={autoReopenBannerOpenStyle}
       >
-        Reopen
+        Reabrir
       </button>
     </section>
   );
@@ -724,7 +724,7 @@ function RecentCard({
       {hovered && (
         <button
           type="button"
-          title="Remove from recents"
+          title="Remover dos recentes"
           aria-label={`Remove ${entry.name} from recents`}
           data-testid={`recent-card-delete-${entry.id}`}
           style={{
@@ -871,18 +871,18 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
       <section style={{ ...styles.hero, ...(isMobile && mobile.hero) }}>
         <div style={styles.heroEyebrow}>Digital Door Docs Editor</div>
         <h1 style={{ ...styles.heroTitle, ...(isMobile && mobile.heroTitle) }}>
-          Start something today.
+          Comece algo hoje.
         </h1>
         <p style={{ ...styles.heroLede, ...(isMobile && mobile.heroLede) }}>
-          A real-time collaborative <code>.docx</code> editor that runs in the browser. Pick a
-          template designed for the way you actually work — or open a file from your computer.
+          Editor colaborativo de <code>.docx</code> em tempo real, direto no navegador. Escolha um
+          modelo ou abra um arquivo do seu computador.
         </p>
       </section>
 
       {blankDocument && blankMarkdown && (
-        <section style={{ ...styles.section, ...(isMobile && mobile.section) }} aria-label="Create new">
+        <section style={{ ...styles.section, ...(isMobile && mobile.section) }} aria-label="Criar novo">
           <div style={{ ...styles.sectionHead, ...(isMobile && mobile.sectionHead) }}>
-            <h2 style={styles.sectionTitle}>Create new</h2>
+            <h2 style={styles.sectionTitle}>Criar novo</h2>
           </div>
           <div style={{ ...styles.featuredRow, ...(isMobile && mobile.featuredRow) }}>
             <TemplateCard
@@ -906,7 +906,7 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
           </span>
           <input
             type="search"
-            placeholder="Search templates"
+            placeholder="Pesquisar modelos"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             style={styles.searchInput}
@@ -924,12 +924,12 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
           <span className="material-symbols-outlined" style={{ fontSize: 18 }} aria-hidden="true">
             folder_open
           </span>
-          Open file
+          Abrir arquivo
         </button>
         <div
           style={{ ...styles.pillRow, ...(isMobile && mobile.pillRow) }}
           role="group"
-          aria-label="Filter by category"
+          aria-label="Filtrar por categoria"
         >
           {(['All', ...CATEGORIES] as CategoryFilter[]).map((c) => {
             const active = category === c;
@@ -959,8 +959,8 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
           data-testid="home-recent"
         >
           <div style={{ ...styles.sectionHead, ...(isMobile && mobile.sectionHead) }}>
-            <h2 style={styles.sectionTitle}>Recent</h2>
-            <span style={styles.sectionHint}>Pick up where you left off.</span>
+            <h2 style={styles.sectionTitle}>Recentes</h2>
+            <span style={styles.sectionHint}>Continue de onde parou.</span>
             <button
               type="button"
               onClick={handleClearAllRecents}
@@ -976,7 +976,7 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
               }}
               data-testid="home-clear-recents"
             >
-              Clear all
+              Limpar tudo
             </button>
           </div>
           <div
@@ -998,8 +998,8 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
       {!isFiltered && (
         <section style={{ ...styles.section, ...(isMobile && mobile.section) }}>
           <div style={{ ...styles.sectionHead, ...(isMobile && mobile.sectionHead) }}>
-            <h2 style={styles.sectionTitle}>Featured</h2>
-            <span style={styles.sectionHint}>A few picks to get going.</span>
+            <h2 style={styles.sectionTitle}>Destaques</h2>
+            <span style={styles.sectionHint}>Algumas sugestões para começar.</span>
           </div>
           <div style={{ ...styles.featuredRow, ...(isMobile && mobile.featuredRow) }}>
             {featured.map((t) => (
@@ -1020,7 +1020,7 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
             </span>
           </div>
           {filtered.length === 0 ? (
-            <div style={styles.empty}>No templates match. Try a different keyword.</div>
+            <div style={styles.empty}>Nenhum modelo encontrado. Tente outra palavra.</div>
           ) : (
             <div style={{ ...styles.grid, ...(isMobile && mobile.grid) }}>
               {filtered.map((t) => (
@@ -1076,7 +1076,7 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
           margin: '24px auto 0',
           padding: isMobile ? '0 16px' : '0 40px',
         }}
-        aria-label="AI features pre-release"
+        aria-label="Recursos de IA em pré-lançamento"
       >
         <div
           style={{
@@ -1105,12 +1105,11 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
               flexShrink: 0,
             }}
           >
-            Pre-release
+            Pré-lançamento
           </span>
           <span style={{ fontSize: '13px', color: '#475569', lineHeight: 1.4 }}>
-            <strong style={{ color: '#0f172a' }}>AI features are on the way</strong> — inline ask,
-            rewrite panel, and a DocOps chat panel. On-device in the desktop app, or the Anthropic
-            API on the web.
+            <strong style={{ color: '#0f172a' }}>Recursos de IA a caminho</strong>: pergunta em linha,
+            painel de reescrita e chat de DocOps.
           </span>
         </div>
       </section>

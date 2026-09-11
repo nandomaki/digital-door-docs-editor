@@ -100,8 +100,8 @@ interface ErrorPanelProps {
 }
 
 export function ErrorPanel({
-  title = "Couldn't join the session",
-  detail = "The shared document might have ended, or the backend host isn't reachable. You can retry, or start fresh in single-user mode.",
+  title = "Não foi possível entrar na sessão",
+  detail = "O documento compartilhado pode ter sido encerrado, ou o servidor está inacessível. Você pode tentar de novo ou começar no modo individual.",
   error,
   onRetry,
 }: ErrorPanelProps) {
@@ -119,15 +119,15 @@ export function ErrorPanel({
               window.location.href = window.location.origin;
             }}
           >
-            Open single-user mode
+            Abrir modo individual
           </button>
           {onRetry ? (
             <button style={styles.primaryBtn} onClick={onRetry}>
-              Try again
+              Tentar de novo
             </button>
           ) : (
             <button style={styles.primaryBtn} onClick={() => window.location.reload()}>
-              Reload
+              Recarregar
             </button>
           )}
         </div>

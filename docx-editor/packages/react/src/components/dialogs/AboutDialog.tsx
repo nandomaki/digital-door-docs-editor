@@ -149,12 +149,12 @@ export function AboutDialog({
     <Dialog
       isOpen={isOpen}
       onClose={onClose}
-      title={`About ${appName}`}
+      title={`Sobre o ${appName}`}
       testId="about-dialog"
       width={520}
       footer={
         <button type="button" style={primaryBtnStyle} onClick={onClose} data-testid="about-close">
-          Close
+          Fechar
         </button>
       }
     >
@@ -167,7 +167,7 @@ export function AboutDialog({
           Editor de documentos <code>.docx</code> com edição colaborativa em tempo real.
         </p>
         <dl style={factsStyle}>
-          <dt style={dtStyle}>Version</dt>
+          <dt style={dtStyle}>Versão</dt>
           <dd style={ddStyle} data-testid="about-version">
             {APP_VERSION}
           </dd>

@@ -56,7 +56,7 @@ export function LoadingPanel({ message = 'Joining session…' }: { message?: str
       <div style={styles.card}>
         <div style={styles.spinner} />
         <p style={styles.title}>{message}</p>
-        <p style={styles.subtitle}>Loading the shared document…</p>
+        <p style={styles.subtitle}>Carregando o documento compartilhado…</p>
       </div>
     </div>
   );

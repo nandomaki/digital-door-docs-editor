@@ -5,7 +5,7 @@
 // Share button + modal. The "start collaborating" entry point.
 //
 // Flow:
-//   1. User clicks "Share for collaboration".
+//   1. User clicks "Compartilhar para colaboração".
 //   2. We mint a transient room on the collab server (POST /api/rooms)
 //      and seed it with the current document bytes
 //      (POST /api/rooms/{id}/seed).
@@ -245,8 +245,8 @@ export function ShareDialog({
       <div style={styles.card} onClick={(e) => e.stopPropagation()}>
         <h3 style={styles.title}>Share for collaboration</h3>
         <p style={styles.subtitle}>
-          Anyone with this link can open the document and edit it live. The session lives only while
-          someone has it open — when everyone leaves, the document is dropped.
+          Qualquer pessoa com este link pode abrir o documento e editar ao vivo. A sessão existe
+          enquanto alguém estiver com o documento aberto. Quando todos saem, ela é encerrada.
         </p>
 
         {state === 'error' && <div style={styles.errorBanner}>{errorMsg}</div>}
@@ -284,10 +284,10 @@ export function ShareDialog({
             </div>
             <div style={styles.footerRow}>
               <button style={styles.secondaryBtn} onClick={onClose}>
-                Stay in single-user mode
+                Continuar no modo individual
               </button>
               <button style={styles.primaryBtn} onClick={joinNow}>
-                Join the session
+                Entrar na sessão
               </button>
             </div>
           </>
@@ -296,7 +296,7 @@ export function ShareDialog({
         {state === 'error' && (
           <div style={styles.footerRow}>
             <button style={styles.secondaryBtn} onClick={onClose}>
-              Close
+              Fechar
             </button>
           </div>
         )}

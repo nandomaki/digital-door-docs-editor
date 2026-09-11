@@ -1141,7 +1141,7 @@ export function Toolbar({
               ? [
                   {
                     icon: 'info',
-                    label: 'About Digital Door Docs Editor',
+                    label: 'Sobre o Digital Door Docs Editor',
                     onClick: onShowAbout,
                   } as MenuEntry,
                 ]

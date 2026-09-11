@@ -10,6 +10,7 @@ import {
   createEmptyDocument,
   PresenceCluster,
 } from '@casualoffice/docs';
+import ptBR from '@casualoffice/docs/i18n/pt-BR.json';
 import { useCollab } from './collab/useCollab';
 import { StatusBadge } from './collab/StatusBadge';
 import { ShareDialog } from './collab/Share';
@@ -216,7 +217,7 @@ function AuthGateE2E() {
         >
           <UserMenu />
         </div>
-        <div style={{ fontSize: 18 }}>Signed in</div>
+        <div style={{ fontSize: 18 }}>Conectado</div>
       </div>
     </PersonalAuthGate>
   );
@@ -482,7 +483,7 @@ export function App() {
   useEffect(() => {
     const APP_NAME = 'Digital Door Docs Editor';
     if (view === 'editor' && fileName) {
-      const base = fileName.replace(/\.docx$/i, '').trim() || 'Untitled';
+      const base = fileName.replace(/\.docx$/i, '').trim() || 'Sem título';
       document.title = `${base} — ${APP_NAME}`;
     } else {
       document.title = APP_NAME;
@@ -1311,7 +1312,7 @@ export function App() {
   const renderLogo = useCallback(() => {
     // In Casual Office the logo brings the launcher window forward rather
     // than navigating to a (nonexistent) web home, so label it accordingly.
-    const logoLabel = isDesktop ? 'Back to Digital Door Docs Editor' : 'Return to home';
+    const logoLabel = isDesktop ? 'Voltar ao Digital Door Docs Editor' : 'Voltar ao início';
     return (
       <button
         type="button"
@@ -1372,7 +1373,7 @@ export function App() {
             style={{ ...styles.button, background: '#2563eb', color: '#fff', border: 'none' }}
             onClick={() => setShareOpen(true)}
           >
-            Share
+            Compartilhar
           </button>
         )}
         {/* Local-user chip in place of Share when running in Casual
@@ -1517,7 +1518,7 @@ export function App() {
           {loadError.message}
         </div>
         <div style={{ fontSize: 13, color: '#94a3b8', maxWidth: 520 }}>
-          The file was left unchanged — nothing was saved over it.
+          O arquivo foi mantido como estava. Nada foi gravado por cima dele.
         </div>
         <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
           <button
@@ -1526,7 +1527,7 @@ export function App() {
             onClick={() => window.location.reload()}
             style={{ ...styles.button, background: '#2563eb', color: '#fff', border: 'none' }}
           >
-            Retry
+            Tentar de novo
           </button>
           <button
             type="button"
@@ -1541,7 +1542,7 @@ export function App() {
             }}
             style={styles.button}
           >
-            Close
+            Fechar
           </button>
         </div>
       </div>
@@ -1582,7 +1583,7 @@ export function App() {
                 padding: '6px 14px',
               }}
             >
-              Restore
+              Restaurar
             </button>
             <button
               type="button"
@@ -1590,11 +1591,12 @@ export function App() {
               onClick={handleDiscardRecovery}
               style={{ ...styles.button, padding: '6px 14px' }}
             >
-              Discard
+              Descartar
             </button>
           </div>
         )}
         <DocxEditor
+          i18n={ptBR}
           ref={editorRef}
           document={documentBuffer ? undefined : currentDocument}
           documentBuffer={documentBuffer}
@@ -1800,6 +1802,7 @@ function CollabApp({
       <DisconnectedBanner status={status} />
       <main style={styles.main}>
         <DocxEditor
+          i18n={ptBR}
           ref={editorRef}
           documentBuffer={seed.buffer}
           externalPlugins={plugins}

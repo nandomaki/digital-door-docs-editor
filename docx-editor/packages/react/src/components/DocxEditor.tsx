@@ -11872,7 +11872,7 @@ export const DocxEditor = forwardRef<DocxEditorRef, DocxEditorProps>(function Do
 
                       {
                         id: 'help.about',
-                        label: 'About Digital Door Docs Editor',
+                        label: 'Sobre o Digital Door Docs Editor',
                         path: 'Help',
                         run: handleShowAbout,
                       },

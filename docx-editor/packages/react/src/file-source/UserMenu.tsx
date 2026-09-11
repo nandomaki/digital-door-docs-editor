@@ -170,7 +170,7 @@ export function UserMenu({ className, onLogout, authClient, testId = 'user-menu'
             data-testid={`${testId}-signout`}
             style={menuItemStyle(signingOut)}
           >
-            {signingOut ? 'Signing out…' : 'Sign out'}
+            {signingOut ? 'Saindo…' : 'Sair'}
           </button>
         </div>
       )}
