@@ -12,7 +12,6 @@
 
 import type { CSSProperties } from 'react';
 import { Dialog } from '../ui/Dialog';
-import { openExternal } from '../../utils/openExternal';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const APP_VERSION: string = (globalThis as any).__APP_VERSION__ ?? 'dev';
@@ -114,25 +113,7 @@ const linkStyle: CSSProperties = {
  * (light) or glares (dark).
  */
 function CasualEditorLogo({ size = 56 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      role="img"
-      aria-label="Digital Door Docs Editor"
-    >
-      <rect width="64" height="64" rx="14" fill="#1a73e8" />
-      <path d="M18 14 H42 L48 20 V50 H18 Z" fill="#ffffff" />
-      <path d="M42 14 L48 20 H42 Z" fill="#1557b0" />
-      <rect x="22" y="26" width="22" height="2.5" rx="1.25" fill="#1a73e8" opacity="0.85" />
-      <rect x="22" y="33" width="18" height="2.5" rx="1.25" fill="#1a73e8" opacity="0.6" />
-      <rect x="22" y="40" width="22" height="2.5" rx="1.25" fill="#1a73e8" opacity="0.85" />
-      <rect x="22" y="47" width="12" height="2.5" rx="1.25" fill="#1a73e8" opacity="0.6" />
-    </svg>
-  );
+  return <img src="/favicon.png" width={size} height={size} alt="" aria-hidden="true" />;
 }
 
 export function AboutDialog({

@@ -5,7 +5,7 @@
 // Share button + modal. The "start collaborating" entry point.
 //
 // Flow:
-//   1. User clicks "Compartilhar para colaboração".
+//   1. User clicks "Share for collaboration".
 //   2. We mint a transient room on the collab server (POST /api/rooms)
 //      and seed it with the current document bytes
 //      (POST /api/rooms/{id}/seed).
@@ -25,6 +25,7 @@
 // layer or extra deps.
 import { useCallback, useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
+import { useTranslation } from '@casualoffice/docs';
 
 export interface ShareDialogProps {
   /** Current document buffer (the bytes the user is editing). */
@@ -156,6 +157,7 @@ export function ShareDialog({
   open,
   onClose,
 }: ShareDialogProps) {
+  const { t } = useTranslation();
   const [state, setState] = useState<'idle' | 'uploading' | 'ready' | 'error'>('idle');
   const [shareUrl, setShareUrl] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -171,7 +173,7 @@ export function ShareDialog({
       return;
     }
     if (!documentBuffer) {
-      setErrorMsg('No document loaded yet.');
+      setErrorMsg(t('collab.noDocumentLoaded'));
       setState('error');
       return;
     }
@@ -220,7 +222,7 @@ export function ShareDialog({
         setErrorMsg(err instanceof Error ? err.message : String(err));
         setState('error');
       });
-  }, [open, documentBuffer, fileName, collabHttp, backendWs]);
+  }, [open, documentBuffer, fileName, collabHttp, backendWs, t]);
 
   const copy = useCallback(async () => {
     try {
@@ -243,11 +245,8 @@ export function ShareDialog({
   return (
     <div style={styles.backdrop} onClick={onClose}>
       <div style={styles.card} onClick={(e) => e.stopPropagation()}>
-        <h3 style={styles.title}>Share for collaboration</h3>
-        <p style={styles.subtitle}>
-          Qualquer pessoa com este link pode abrir o documento e editar ao vivo. A sessão existe
-          enquanto alguém estiver com o documento aberto. Quando todos saem, ela é encerrada.
-        </p>
+        <h3 style={styles.title}>{t('collab.shareTitle')}</h3>
+        <p style={styles.subtitle}>{t('collab.shareDescription')}</p>
 
         {state === 'error' && <div style={styles.errorBanner}>{errorMsg}</div>}
 
@@ -262,7 +261,7 @@ export function ShareDialog({
             }}
           >
             <span style={styles.spinner} />
-            Preparing share link…
+            {t('collab.preparingShareLink')}
           </div>
         )}
 
@@ -279,15 +278,15 @@ export function ShareDialog({
                 style={{ ...styles.copyBtn, ...(copied ? styles.copyBtnOk : {}) }}
                 onClick={copy}
               >
-                {copied ? 'Copied' : 'Copy link'}
+                {copied ? t('share.copied') : t('hyperlinkPopup.copyLink')}
               </button>
             </div>
             <div style={styles.footerRow}>
               <button style={styles.secondaryBtn} onClick={onClose}>
-                Continuar no modo individual
+                {t('collab.stayInSingleUserMode')}
               </button>
               <button style={styles.primaryBtn} onClick={joinNow}>
-                Entrar na sessão
+                {t('collab.joinTheSession')}
               </button>
             </div>
           </>
@@ -296,7 +295,7 @@ export function ShareDialog({
         {state === 'error' && (
           <div style={styles.footerRow}>
             <button style={styles.secondaryBtn} onClick={onClose}>
-              Fechar
+              {t('common.close')}
             </button>
           </div>
         )}

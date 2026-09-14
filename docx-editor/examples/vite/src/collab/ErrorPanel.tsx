@@ -10,6 +10,7 @@
 // Either way we want a clean recovery option: drop them back to
 // single-user mode on the same origin.
 import type { CSSProperties } from 'react';
+import { useTranslation } from '@casualoffice/docs';
 
 const styles: Record<string, CSSProperties> = {
   shell: {
@@ -99,18 +100,16 @@ interface ErrorPanelProps {
   onRetry?: () => void;
 }
 
-export function ErrorPanel({
-  title = "Não foi possível entrar na sessão",
-  detail = "O documento compartilhado pode ter sido encerrado, ou o servidor está inacessível. Você pode tentar de novo ou começar no modo individual.",
-  error,
-  onRetry,
-}: ErrorPanelProps) {
+export function ErrorPanel({ title, detail, error, onRetry }: ErrorPanelProps) {
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t('collab.couldntJoinSession');
+  const resolvedDetail = detail ?? t('collab.errorDetailDefault');
   return (
     <div style={styles.shell}>
       <div style={styles.card}>
         <div style={styles.icon}>!</div>
-        <h2 style={styles.title}>{title}</h2>
-        <p style={styles.detail}>{detail}</p>
+        <h2 style={styles.title}>{resolvedTitle}</h2>
+        <p style={styles.detail}>{resolvedDetail}</p>
         {error && <div style={styles.code}>{error}</div>}
         <div style={styles.row}>
           <button
@@ -119,15 +118,15 @@ export function ErrorPanel({
               window.location.href = window.location.origin;
             }}
           >
-            Abrir modo individual
+            {t('collab.openSingleUserMode')}
           </button>
           {onRetry ? (
             <button style={styles.primaryBtn} onClick={onRetry}>
-              Tentar de novo
+              {t('collab.tryAgain')}
             </button>
           ) : (
             <button style={styles.primaryBtn} onClick={() => window.location.reload()}>
-              Recarregar
+              {t('collab.reload')}
             </button>
           )}
         </div>

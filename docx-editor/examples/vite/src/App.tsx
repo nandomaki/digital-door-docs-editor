@@ -9,8 +9,8 @@ import {
   type Document as DocxDocument,
   createEmptyDocument,
   PresenceCluster,
+  useTranslation,
 } from '@casualoffice/docs';
-import ptBR from '../../../packages/react/i18n/pt-BR.json';
 import { useCollab } from './collab/useCollab';
 import { StatusBadge } from './collab/StatusBadge';
 import { ShareDialog } from './collab/Share';
@@ -196,6 +196,7 @@ function isAutosaveE2E(): boolean {
 }
 
 function AuthGateE2E() {
+  const { t } = useTranslation();
   return (
     <PersonalAuthGate>
       <div
@@ -217,7 +218,7 @@ function AuthGateE2E() {
         >
           <UserMenu />
         </div>
-        <div style={{ fontSize: 18 }}>Conectado</div>
+        <div style={{ fontSize: 18 }}>{t('app.signedIn')}</div>
       </div>
     </PersonalAuthGate>
   );
@@ -259,6 +260,7 @@ function makeFakeFileSource(): FileSource {
 }
 
 function AutosaveE2E() {
+  const { t } = useTranslation();
   // Fake editor ref that returns a 4-byte buffer on demand. The
   // bytes themselves don't matter — the spec only checks that the
   // save round-trip fires and the status component updates.
@@ -309,7 +311,7 @@ function AutosaveE2E() {
           <AutosaveStatus state={state} />
           <UserMenu />
         </div>
-        <div style={{ fontSize: 18 }}>Autosave fixture</div>
+        <div style={{ fontSize: 18 }}>{t('app.autosaveFixture')}</div>
       </div>
     </PersonalAuthGate>
   );
@@ -335,7 +337,7 @@ interface EmbedConfig {
   hostOrigin: string;
 }
 
-function parseEmbedConfig(): EmbedConfig | { error: string } {
+function parseEmbedConfig(): EmbedConfig | { error: string | null } {
   try {
     const params = new URLSearchParams(window.location.search);
     const raw = params.get('config');
@@ -346,16 +348,19 @@ function parseEmbedConfig(): EmbedConfig | { error: string } {
     if (!cfg.hostOrigin) return { error: 'EmbedConfig.hostOrigin is required' };
     return cfg;
   } catch (err) {
-    return { error: err instanceof Error ? err.message : 'Bad config' };
+    // null (rather than a hardcoded 'Bad config') lets the component below
+    // supply the translated fallback — this function isn't a component/hook.
+    return { error: err instanceof Error ? err.message : null };
   }
 }
 
 function EmbedRoute() {
+  const { t } = useTranslation();
   const result = parseEmbedConfig();
   if ('error' in result) {
     return (
       <div style={{ padding: 32, fontFamily: 'system-ui, sans-serif', color: '#b91c1c' }}>
-        <strong>Embed configuration error:</strong> {result.error}
+        <strong>{t('app.embedConfigError')}</strong> {result.error ?? t('app.badConfig')}
       </div>
     );
   }
@@ -385,6 +390,7 @@ export function App() {
     return <EmbedRoute />;
   }
 
+  const { t } = useTranslation();
   const randomAuthor = useMemo(
     () => `Docx Editor User ${Math.floor(Math.random() * 900) + 100}`,
     []
@@ -483,7 +489,7 @@ export function App() {
   useEffect(() => {
     const APP_NAME = 'Digital Door Docs Editor';
     if (view === 'editor' && fileName) {
-      const base = fileName.replace(/\.docx$/i, '').trim() || 'Sem título';
+      const base = fileName.replace(/\.docx$/i, '').trim() || 'Untitled';
       document.title = `${base} — ${APP_NAME}`;
     } else {
       document.title = APP_NAME;
@@ -854,7 +860,7 @@ export function App() {
           setView('editor');
           return;
         }
-        if (entry.source.kind === 'docx') setStatus('Loading template…');
+        if (entry.source.kind === 'docx') setStatus(t('app.statusLoadingTemplate'));
         const loaded = await loadTemplate(entry);
         if (requestId !== documentLoadRequestRef.current) return;
         suppressSeedDocumentRef.current = true;
@@ -872,7 +878,7 @@ export function App() {
       } catch (err) {
         if (requestId !== documentLoadRequestRef.current) return;
         const message = err instanceof Error ? err.message : String(err);
-        setStatus(`Failed to load template: ${message}`);
+        setStatus(t('app.statusFailedToLoadTemplate', { message }));
       }
     },
     [legacyForcedEditor]
@@ -883,7 +889,7 @@ export function App() {
       const requestId = ++documentLoadRequestRef.current;
       try {
         suppressSeedDocumentRef.current = true;
-        setStatus('Loading…');
+        setStatus(t('writerStatus.loading'));
         // Cast to string so the compiler doesn't narrow away 'rtf'/'eml'
         // which are ViewerFormat additions not present in the older dist .d.ts.
         const fmt = formatFromFilename(file.name) as string | null;
@@ -934,7 +940,7 @@ export function App() {
         // File → Open path so the Home picker isn't DOCX-only.
         let buffer: ArrayBuffer = raw;
         if (fmt && isForeignFormat(fmt)) {
-          setStatus('Converting…');
+          setStatus(t('app.statusConverting'));
           const out = await convertToDocx(new Uint8Array(raw), fmt);
           if (requestId !== documentLoadRequestRef.current) return;
           buffer = out.buffer.slice(out.byteOffset, out.byteOffset + out.byteLength) as ArrayBuffer;
@@ -949,7 +955,7 @@ export function App() {
         setView('editor');
       } catch {
         if (requestId !== documentLoadRequestRef.current) return;
-        setStatus('Error loading file');
+        setStatus(t('app.statusErrorLoadingFile'));
       }
     },
     [legacyForcedEditor]
@@ -1017,7 +1023,7 @@ export function App() {
   const handleSave = useCallback(async () => {
     if (!editorRef.current) return;
     try {
-      setStatus('Saving…');
+      setStatus(t('titleBar.saving'));
       const buffer = await editorRef.current.save();
       if (!buffer) return;
       const bridge = typeof window !== 'undefined' ? window.__deskApp__ : undefined;
@@ -1026,7 +1032,7 @@ export function App() {
         const name = written.split(/[\\/]/).pop();
         if (name) setFileName(name);
         clearRecovery();
-        setStatus('Saved');
+        setStatus(t('unsaved.saved'));
         setTimeout(() => setStatus(''), 1500);
         return;
       }
@@ -1042,13 +1048,13 @@ export function App() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      setStatus('Saved!');
+      setStatus(t('app.statusSavedBang'));
       setTimeout(() => setStatus(''), 2000);
     } catch (err) {
       console.error('save failed', err);
-      setStatus('Save failed');
+      setStatus(t('app.statusSaveFailed'));
     }
-  }, [fileName, clearRecovery]);
+  }, [fileName, clearRecovery, t]);
 
   const handleSaveAs = useCallback(async () => {
     if (!editorRef.current) return;
@@ -1058,7 +1064,7 @@ export function App() {
       return handleSave();
     }
     try {
-      setStatus('Saving…');
+      setStatus(t('titleBar.saving'));
       const buffer = await editorRef.current.save();
       if (!buffer) return;
       const written = await bridge.saveAs(fileName || 'Untitled.docx', buffer);
@@ -1066,16 +1072,16 @@ export function App() {
         const name = written.split(/[\\/]/).pop();
         if (name) setFileName(name);
         clearRecovery();
-        setStatus('Saved');
+        setStatus(t('unsaved.saved'));
         setTimeout(() => setStatus(''), 1500);
       } else {
         setStatus('');
       }
     } catch (err) {
       console.error('saveAs failed', err);
-      setStatus('Save As failed');
+      setStatus(t('app.statusSaveAsFailed'));
     }
-  }, [fileName, handleSave, clearRecovery]);
+  }, [fileName, handleSave, clearRecovery, t]);
 
   // Local-user profile shown in the title bar (replaces the Share
   // button slot when running inside Casual Office). Fetched once on
@@ -1111,7 +1117,7 @@ export function App() {
     async (buffer: ArrayBuffer) => {
       const bridge = typeof window !== 'undefined' ? window.__deskApp__ : undefined;
       if (!bridge?.isDesktop) return;
-      setStatus('Saving…');
+      setStatus(t('titleBar.saving'));
       try {
         const written = await bridge.save(buffer);
         if (typeof written === 'string') {
@@ -1121,15 +1127,15 @@ export function App() {
         // Clean save: the file on disk now IS the latest state, so drop the
         // crash-recovery sidecar (and any pending snapshot timer).
         clearRecovery();
-        setStatus('Saved');
+        setStatus(t('unsaved.saved'));
         setTimeout(() => setStatus(''), 1500);
       } catch (err) {
         console.error('desktop save failed', err);
-        setStatus('Save failed');
+        setStatus(t('app.statusSaveFailed'));
         setTimeout(() => setStatus(''), 2500);
       }
     },
-    [clearRecovery]
+    [clearRecovery, t]
   ); // bridge.save, setStatus, setFileName are stable across renders
 
   // Document rename. Updates the title locally and, on desktop, renames the
@@ -1230,10 +1236,13 @@ export function App() {
     if (isDesktop) window.__deskApp__?.dismissBoot?.();
   }, [isDesktop]);
 
-  const handleError = useCallback((error: Error) => {
-    console.error('Editor error:', error);
-    setStatus(`Error: ${error.message}`);
-  }, []);
+  const handleError = useCallback(
+    (error: Error) => {
+      console.error('Editor error:', error);
+      setStatus(t('app.statusError', { message: error.message }));
+    },
+    [t]
+  );
 
   // Reload when the open file is modified by another process (e.g. the user
   // saves from Word). The bootstrap translates the Rust watcher's Tauri event
@@ -1253,16 +1262,14 @@ export function App() {
           .then((buffer) => setDocumentBuffer(buffer))
           .catch((err) => console.error('[deskApp] file-changed reload failed', err));
       } else if (kind === 'removed') {
-        setStatus(
-          'File was deleted from disk — your in-memory edits are still here. Use File → Save As to save a copy.'
-        );
+        setStatus(t('app.statusFileDeleted'));
       } else if (kind === 'renamed') {
-        setStatus('File was renamed or moved — Save will prompt you to choose a new location.');
+        setStatus(t('app.statusFileRenamedMoved'));
       }
     };
     window.addEventListener('deskapp:file-changed', onFileChanged);
     return () => window.removeEventListener('deskapp:file-changed', onFileChanged);
-  }, [isDesktop]);
+  }, [isDesktop, t]);
 
   const handleFontsLoaded = useCallback(() => {
     console.log('Fonts loaded');
@@ -1289,9 +1296,7 @@ export function App() {
       }
       return;
     }
-    const ok = window.confirm(
-      'Leave this document and return to the home page?\n\nUnsaved changes will be lost.'
-    );
+    const ok = window.confirm(t('app.confirmLeaveDocument'));
     if (!ok) return;
     setCurrentDocument(null);
     setDocumentBuffer(null);
@@ -1302,7 +1307,7 @@ export function App() {
     // Drives both the URL and the view; the route effect flips view='home'.
     if (!legacyForcedEditor) navigate('/home');
     setView('home');
-  }, [isDesktop, legacyForcedEditor]);
+  }, [isDesktop, legacyForcedEditor, t]);
 
   // Clickable variant of the title-bar logo. Sources the branded
   // `/logo.svg` from the demo's `public/` so the title-bar mark, the
@@ -1312,7 +1317,7 @@ export function App() {
   const renderLogo = useCallback(() => {
     // In Casual Office the logo brings the launcher window forward rather
     // than navigating to a (nonexistent) web home, so label it accordingly.
-    const logoLabel = isDesktop ? 'Voltar ao Digital Door Docs Editor' : 'Voltar ao início';
+    const logoLabel = isDesktop ? t('app.backToCasualOffice') : t('app.returnToHome');
     return (
       <button
         type="button"
@@ -1348,7 +1353,7 @@ export function App() {
         data-testid="title-bar-home"
       >
         <img
-          src="/logo.svg"
+          src="/favicon.png"
           alt=""
           width={32}
           height={32}
@@ -1357,7 +1362,7 @@ export function App() {
         />
       </button>
     );
-  }, [handleGoHome, isDesktop]);
+  }, [handleGoHome, isDesktop, t]);
 
   // Top-right area: just Share (Google Docs pattern). Open / Save / New
   // live in the File menu and are driven by <DocxEditor>'s internal
@@ -1373,7 +1378,7 @@ export function App() {
             style={{ ...styles.button, background: '#2563eb', color: '#fff', border: 'none' }}
             onClick={() => setShareOpen(true)}
           >
-            Compartilhar
+            {t('app.share')}
           </button>
         )}
         {/* Local-user chip in place of Share when running in Casual
@@ -1422,7 +1427,7 @@ export function App() {
         {status && <span style={styles.status}>{status}</span>}
       </div>
     ),
-    [status, collabEnabled, isDesktop, deskProfile]
+    [status, collabEnabled, isDesktop, deskProfile, t]
   );
 
   // Collab mode is a hard fork: the editor binds to a Y.Doc fed by
@@ -1512,13 +1517,13 @@ export function App() {
         }}
       >
         <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--doc-fg, #1f2937)' }}>
-          Couldn’t open {loadError.fileName}
+          {t('app.couldntOpenFile', { fileName: loadError.fileName })}
         </div>
         <div style={{ fontSize: 14, color: '#64748b', maxWidth: 520, lineHeight: 1.5 }}>
           {loadError.message}
         </div>
         <div style={{ fontSize: 13, color: '#94a3b8', maxWidth: 520 }}>
-          O arquivo foi mantido como estava. Nada foi gravado por cima dele.
+          {t('app.fileLeftUnchanged')}
         </div>
         <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
           <button
@@ -1527,7 +1532,7 @@ export function App() {
             onClick={() => window.location.reload()}
             style={{ ...styles.button, background: '#2563eb', color: '#fff', border: 'none' }}
           >
-            Tentar de novo
+            {t('common.retry')}
           </button>
           <button
             type="button"
@@ -1542,7 +1547,7 @@ export function App() {
             }}
             style={styles.button}
           >
-            Fechar
+            {t('common.close')}
           </button>
         </div>
       </div>
@@ -1568,9 +1573,7 @@ export function App() {
               fontSize: 13,
             }}
           >
-            <span style={{ flex: 1 }}>
-              This document had unsaved changes from a previous session. Restore them?
-            </span>
+            <span style={{ flex: 1 }}>{t('app.restoreUnsavedChanges')}</span>
             <button
               type="button"
               data-testid="recovery-restore"
@@ -1583,7 +1586,7 @@ export function App() {
                 padding: '6px 14px',
               }}
             >
-              Restaurar
+              {t('app.restore')}
             </button>
             <button
               type="button"
@@ -1591,12 +1594,11 @@ export function App() {
               onClick={handleDiscardRecovery}
               style={{ ...styles.button, padding: '6px 14px' }}
             >
-              Descartar
+              {t('app.discard')}
             </button>
           </div>
         )}
         <DocxEditor
-          i18n={ptBR}
           ref={editorRef}
           document={documentBuffer ? undefined : currentDocument}
           documentBuffer={documentBuffer}
@@ -1802,7 +1804,6 @@ function CollabApp({
       <DisconnectedBanner status={status} />
       <main style={styles.main}>
         <DocxEditor
-          i18n={ptBR}
           ref={editorRef}
           documentBuffer={seed.buffer}
           externalPlugins={plugins}

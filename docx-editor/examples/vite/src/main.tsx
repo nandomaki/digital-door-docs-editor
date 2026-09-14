@@ -9,7 +9,8 @@ import './desk-bridge-bootstrap';
 import './styles.css';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
-import { setSpellAssetUrls, setWriterWorkerUrl } from '@casualoffice/docs';
+import { LocaleProvider, setSpellAssetUrls, setWriterWorkerUrl } from '@casualoffice/docs';
+import ptBR from '../../../packages/react/i18n/pt-BR.json';
 // Vite asset imports — Hunspell dictionary files served as static
 // assets with hashed URLs. The lib doesn't pre-bundle these (its tsup
 // build has no loader for .aff / .dic); the demo provides them at
@@ -33,5 +34,9 @@ setWriterWorkerUrl(writerWorkerUrl);
 const container = document.getElementById('app');
 if (container) {
   const root = createRoot(container);
-  root.render(<App />);
+  root.render(
+    <LocaleProvider i18n={ptBR}>
+      <App />
+    </LocaleProvider>
+  );
 }

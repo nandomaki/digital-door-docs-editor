@@ -38,6 +38,7 @@ import {
 } from 'react';
 
 import { Dialog } from '../components/ui/Dialog';
+import { useTranslation } from '../i18n';
 
 import { AuthClient } from './auth-client';
 import { PersonalFileSourceError } from './personal';
@@ -229,9 +230,11 @@ export function PersonalAuthGate({
   authClient,
   baseUrl,
   onAuthenticated,
-  heading = 'Entrar no Digital Door Docs Editor',
+  heading,
   initialMode = 'login',
 }: PersonalAuthGateProps) {
+  const { t } = useTranslation();
+  const resolvedHeading = heading ?? t('auth.signInHeading');
   const { state, login, signup, logout } = usePersonalAuth({
     authClient,
     baseUrl,
@@ -252,7 +255,7 @@ export function PersonalAuthGate({
   return (
     <PersonalAuthGateModal
       isOpen
-      heading={heading}
+      heading={resolvedHeading}
       initialMode={initialMode}
       onSubmit={async (mode, creds) => {
         if (mode === 'login') {
@@ -298,6 +301,7 @@ export function PersonalAuthGateModal({
   submitError,
   loading,
 }: PersonalAuthGateModalProps) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -342,11 +346,11 @@ export function PersonalAuthGateModal({
         >
           {submitting
             ? mode === 'login'
-              ? 'Entrando…'
-              : 'Criando conta…'
+              ? t('auth.signingIn')
+              : t('auth.creatingAccount')
             : mode === 'login'
-              ? 'Entrar'
-              : 'Criar conta'}
+              ? t('auth.signIn')
+              : t('auth.createAccount')}
         </button>
       }
       helper={
@@ -359,7 +363,7 @@ export function PersonalAuthGateModal({
           data-testid="personal-auth-toggle"
           style={toggleButtonStyle}
         >
-          {mode === 'login' ? 'Criar uma conta' : 'Já tenho uma conta'}
+          {mode === 'login' ? t('auth.createAnAccount') : t('auth.alreadyHaveAccount')}
         </button>
       }
     >
@@ -369,7 +373,7 @@ export function PersonalAuthGateModal({
         style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
       >
         <label style={labelStyle}>
-          <span style={labelTextStyle}>Usuário</span>
+          <span style={labelTextStyle}>{t('auth.username')}</span>
           <input
             type="text"
             value={username}
@@ -385,7 +389,7 @@ export function PersonalAuthGateModal({
           />
         </label>
         <label style={labelStyle}>
-          <span style={labelTextStyle}>Senha</span>
+          <span style={labelTextStyle}>{t('auth.password')}</span>
           <input
             type="password"
             value={password}
@@ -406,23 +410,22 @@ export function PersonalAuthGateModal({
               data-testid="personal-auth-forgot-toggle"
               style={forgotLinkStyle}
             >
-              Forgot password?
+              {t('auth.forgotPassword')}
             </button>
             {forgotOpen && (
               <div role="note" data-testid="personal-auth-forgot-panel" style={forgotPanelStyle}>
-                Mode 3 doesn’t do email recovery — there’s no SMTP server on a single-node deploy.
-                Ask the operator to ssh into the container and run:
+                {t('auth.forgotPasswordInfo1')}
                 <pre style={forgotCodeStyle}>
                   casual-docs reset-password {username || '<your-username>'}
                 </pre>
-                They’ll set a new password for you to sign in with.
+                {t('auth.forgotPasswordInfo2')}
               </div>
             )}
           </div>
         )}
         {submitError && (
           <div data-testid="personal-auth-error" style={errorStyle}>
-            {humanReadable(submitError)}
+            {humanReadable(submitError, t)}
           </div>
         )}
       </form>
@@ -434,27 +437,30 @@ export function PersonalAuthGateModal({
 // Helpers
 // ---------------------------------------------------------------
 
-function humanReadable(err: PersonalFileSourceError): string {
+function humanReadable(
+  err: PersonalFileSourceError,
+  t: ReturnType<typeof useTranslation>['t']
+): string {
   // Codes mirror collab's `{ error }` envelope (auth/personal-routes.ts +
   // the createUser / verifyLogin reasons in auth/personal.ts).
   switch (err.code) {
     case 'invalid-credentials':
-      return 'Usuário e senha não conferem.';
+      return t('auth.error.invalidCredentials');
     case 'username-taken':
-      return 'Esse nome de usuário já está em uso. Tente entrar.';
+      return t('auth.error.usernameTaken');
     case 'invalid-username':
-      return 'Nome de usuário inválido. Use letras, números, ponto, hífen ou sublinhado.';
+      return t('auth.error.invalidUsername');
     case 'weak-password':
-      return 'A senha precisa ter pelo menos 8 caracteres.';
+      return t('auth.error.weakPassword');
     case 'signup-closed':
-      return 'Cadastros estão fechados neste servidor. Peça uma conta ao administrador.';
+      return t('auth.error.signupClosed');
     case 'personal-mode-disabled':
     case 'mode-disabled':
-      return 'Contas não estão habilitadas neste servidor.';
+      return t('auth.error.modeDisabled');
     case 'bad-body':
-      return 'Informe usuário e senha.';
+      return t('auth.error.badBody');
     default:
-      return err.message || 'Algo deu errado. Tente de novo.';
+      return err.message || t('auth.error.generic');
   }
 }
 

@@ -5,11 +5,20 @@
 import React, { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import {
   CATEGORIES,
+  CATEGORY_LABEL_KEYS,
   TEMPLATES,
+  TEMPLATE_NAME_KEYS,
   type TemplateCategory,
   type TemplateEntry,
 } from './templates/manifest';
-import { deleteRecentFile, formatSize, listRecentFiles, type RecentFile } from '@casualoffice/docs';
+import {
+  deleteRecentFile,
+  formatSize,
+  listRecentFiles,
+  useTranslation,
+  type RecentFile,
+  type TranslationKey,
+} from '@casualoffice/docs';
 
 /** Track viewport breakpoint. <720 = phone (single-col controls,
  *  2-col card grid, reduced padding, smaller hero). */
@@ -37,6 +46,12 @@ type CategoryFilter = 'All' | TemplateCategory;
 
 const isCreationTemplate = (template: TemplateEntry) =>
   template.id === 'blank' || template.id === 'blank-markdown';
+
+/** 'All' isn't a real TemplateCategory (it's Home's own filter-only value), so it
+ *  isn't in CATEGORY_LABEL_KEYS — resolve it here instead. */
+function categoryLabelKey(c: CategoryFilter): TranslationKey {
+  return c === 'All' ? 'home.categoryAll' : CATEGORY_LABEL_KEYS[c];
+}
 
 // Theme-aware — these resolve through the editor's design tokens (loaded
 // globally via styles.css -> editor.css -> tokens.css), which flip on
@@ -437,10 +452,14 @@ function TemplateCard({
   onSelect: (entry: TemplateEntry) => void;
   isMobile: boolean;
 }): React.JSX.Element {
+  const { t } = useTranslation();
   const [hovered, setHovered] = useState(false);
   // Blank entries ship an SVG placeholder rather than a PNG render; give them
   // a clean empty-state instead of an image that crops to grey.
   const isBlank = isBlankEntry(entry);
+  const nameKey = TEMPLATE_NAME_KEYS[entry.id];
+  const displayName = nameKey ? t(nameKey) : entry.name;
+  const categoryLabel = t(categoryLabelKey(entry.category));
   return (
     <button
       type="button"
@@ -451,7 +470,7 @@ function TemplateCard({
       onFocus={() => setHovered(true)}
       onBlur={() => setHovered(false)}
       data-testid={`template-card-${entry.id}`}
-      aria-label={`${entry.name} — ${entry.category}`}
+      aria-label={`${displayName} — ${categoryLabel}`}
     >
       <div style={{ ...styles.cardThumbWrap, ...(isMobile && mobile.cardThumbWrap) }}>
         {isBlank ? (
@@ -487,23 +506,27 @@ function TemplateCard({
         )}
       </div>
       <div style={{ ...styles.cardBody, ...(isMobile && mobile.cardBody) }}>
-        <div style={{ ...styles.cardTitle, ...(isMobile && mobile.cardTitle) }}>{entry.name}</div>
+        <div style={{ ...styles.cardTitle, ...(isMobile && mobile.cardTitle) }}>{displayName}</div>
         <div style={{ ...styles.cardCategory, ...(isMobile && mobile.cardCategory) }}>
-          {entry.category}
+          {categoryLabel}
         </div>
       </div>
     </button>
   );
 }
 
-function relativeAgo(ms: number): string {
-  if (ms < 60_000) return 'just now';
+type TFunc = ReturnType<typeof useTranslation>['t'];
+
+// Takes `t` from the caller (a component) — this itself isn't a
+// component/hook, so it can't call useTranslation() on its own.
+function relativeAgo(t: TFunc, ms: number): string {
+  if (ms < 60_000) return t('home.justNow');
   const mins = Math.round(ms / 60_000);
-  if (mins < 60) return `${mins} min ago`;
+  if (mins < 60) return t('home.minutesAgo', { n: mins });
   const hours = Math.round(mins / 60);
-  if (hours < 24) return `${hours} hr ago`;
+  if (hours < 24) return t('home.hoursAgo', { n: hours });
   const days = Math.round(hours / 24);
-  return `${days} day${days === 1 ? '' : 's'} ago`;
+  return t('home.daysAgo', { n: days });
 }
 
 // Auto-reopen banner — Phase A from docs/internal/11-storage-modes.md.
@@ -545,6 +568,7 @@ function AutoReopenBanner({
   onOpen,
   onDismiss,
 }: AutoReopenBannerProps): React.JSX.Element | null {
+  const { t } = useTranslation();
   if (!candidate) return null;
   const age = Date.now() - candidate.openedAt;
   if (age > AUTO_REOPEN_WINDOW_MS) return null;
@@ -553,9 +577,11 @@ function AutoReopenBanner({
       data-testid="auto-reopen-banner"
       style={autoReopenBannerStyle}
       role="region"
-      aria-label="Reabrir último documento"
+      aria-label={t('home.reopenLastDocument')}
     >
-      <span style={{ fontSize: 13, color: COLORS.inkMuted }}>Continue de onde parou</span>
+      <span style={{ fontSize: 13, color: COLORS.inkMuted }}>
+        {t('home.pickUpWhereYouLeftOff')}
+      </span>
       <strong
         data-testid="auto-reopen-banner-name"
         style={{ fontSize: 14, color: COLORS.ink, marginRight: 'auto' }}
@@ -568,7 +594,7 @@ function AutoReopenBanner({
         data-testid="auto-reopen-banner-dismiss"
         style={autoReopenBannerDismissStyle}
       >
-        Dispensar
+        {t('common.dismiss')}
       </button>
       <button
         type="button"
@@ -576,7 +602,7 @@ function AutoReopenBanner({
         data-testid="auto-reopen-banner-open"
         style={autoReopenBannerOpenStyle}
       >
-        Reabrir
+        {t('home.reopen')}
       </button>
     </section>
   );
@@ -691,6 +717,7 @@ function RecentCard({
   onOpen: (r: RecentFile) => void;
   onDelete: (r: RecentFile) => void;
 }): React.JSX.Element {
+  const { t } = useTranslation();
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -705,7 +732,7 @@ function RecentCard({
         style={{ ...recentCardStyle, ...(hovered ? recentCardHoverStyle : null), width: '100%' }}
         onClick={() => onOpen(entry)}
         data-testid={`recent-card-${entry.id}`}
-        aria-label={`Reopen ${entry.name}`}
+        aria-label={t('home.reopenDocumentAria', { name: entry.name })}
       >
         <div style={recentIconBoxStyle}>
           <span className="material-symbols-outlined" aria-hidden="true" style={{ fontSize: 22 }}>
@@ -717,15 +744,15 @@ function RecentCard({
             {entry.name}
           </div>
           <div style={recentSubStyle}>
-            {formatSize(entry.size)} · {relativeAgo(Date.now() - entry.openedAt)}
+            {formatSize(entry.size)} · {relativeAgo(t, Date.now() - entry.openedAt)}
           </div>
         </div>
       </button>
       {hovered && (
         <button
           type="button"
-          title="Remover dos recentes"
-          aria-label={`Remove ${entry.name} from recents`}
+          title={t('home.removeFromRecents')}
+          aria-label={t('home.removeFromRecentsAria', { name: entry.name })}
           data-testid={`recent-card-delete-${entry.id}`}
           style={{
             position: 'absolute',
@@ -760,6 +787,7 @@ function RecentCard({
 }
 
 export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps): React.JSX.Element {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<CategoryFilter>('All');
@@ -852,7 +880,7 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
     <div style={styles.page} data-testid="home-page">
       <header style={{ ...styles.topBar, ...(isMobile && mobile.topBar) }}>
         <div style={styles.brandRow}>
-          <img src="/logo.svg" alt="" style={styles.brandLogo} aria-hidden="true" />
+          <img src="/favicon.png" alt="" style={styles.brandLogo} aria-hidden="true" />
           <div style={styles.brandName}>
             Digital Door <span style={{ color: COLORS.brand }}>Docs Editor</span>
           </div>
@@ -871,18 +899,20 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
       <section style={{ ...styles.hero, ...(isMobile && mobile.hero) }}>
         <div style={styles.heroEyebrow}>Digital Door Docs Editor</div>
         <h1 style={{ ...styles.heroTitle, ...(isMobile && mobile.heroTitle) }}>
-          Comece algo hoje.
+          {t('home.heroTitle')}
         </h1>
         <p style={{ ...styles.heroLede, ...(isMobile && mobile.heroLede) }}>
-          Editor colaborativo de <code>.docx</code> em tempo real, direto no navegador. Escolha um
-          modelo ou abra um arquivo do seu computador.
+          {t('home.heroLedePart1')} <code>.docx</code> {t('home.heroLedePart2')}
         </p>
       </section>
 
       {blankDocument && blankMarkdown && (
-        <section style={{ ...styles.section, ...(isMobile && mobile.section) }} aria-label="Criar novo">
+        <section
+          style={{ ...styles.section, ...(isMobile && mobile.section) }}
+          aria-label={t('home.createNew')}
+        >
           <div style={{ ...styles.sectionHead, ...(isMobile && mobile.sectionHead) }}>
-            <h2 style={styles.sectionTitle}>Criar novo</h2>
+            <h2 style={styles.sectionTitle}>{t('home.createNew')}</h2>
           </div>
           <div style={{ ...styles.featuredRow, ...(isMobile && mobile.featuredRow) }}>
             <TemplateCard
@@ -906,7 +936,7 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
           </span>
           <input
             type="search"
-            placeholder="Pesquisar modelos"
+            placeholder={t('home.searchPlaceholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             style={styles.searchInput}
@@ -924,12 +954,12 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
           <span className="material-symbols-outlined" style={{ fontSize: 18 }} aria-hidden="true">
             folder_open
           </span>
-          Abrir arquivo
+          {t('home.openFile')}
         </button>
         <div
           style={{ ...styles.pillRow, ...(isMobile && mobile.pillRow) }}
           role="group"
-          aria-label="Filtrar por categoria"
+          aria-label={t('home.filterByCategory')}
         >
           {(['All', ...CATEGORIES] as CategoryFilter[]).map((c) => {
             const active = category === c;
@@ -946,7 +976,7 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
                 data-testid={`home-category-${c.toLowerCase()}`}
                 aria-pressed={active}
               >
-                {c}
+                {t(categoryLabelKey(c))}
               </button>
             );
           })}
@@ -959,8 +989,8 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
           data-testid="home-recent"
         >
           <div style={{ ...styles.sectionHead, ...(isMobile && mobile.sectionHead) }}>
-            <h2 style={styles.sectionTitle}>Recentes</h2>
-            <span style={styles.sectionHint}>Continue de onde parou.</span>
+            <h2 style={styles.sectionTitle}>{t('home.recent')}</h2>
+            <span style={styles.sectionHint}>{t('home.recentHint')}</span>
             <button
               type="button"
               onClick={handleClearAllRecents}
@@ -976,7 +1006,7 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
               }}
               data-testid="home-clear-recents"
             >
-              Limpar tudo
+              {t('home.clearAll')}
             </button>
           </div>
           <div
@@ -998,12 +1028,17 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
       {!isFiltered && (
         <section style={{ ...styles.section, ...(isMobile && mobile.section) }}>
           <div style={{ ...styles.sectionHead, ...(isMobile && mobile.sectionHead) }}>
-            <h2 style={styles.sectionTitle}>Destaques</h2>
-            <span style={styles.sectionHint}>Algumas sugestões para começar.</span>
+            <h2 style={styles.sectionTitle}>{t('home.featured')}</h2>
+            <span style={styles.sectionHint}>{t('home.featuredHint')}</span>
           </div>
           <div style={{ ...styles.featuredRow, ...(isMobile && mobile.featuredRow) }}>
-            {featured.map((t) => (
-              <TemplateCard key={t.id} entry={t} onSelect={onSelectTemplate} isMobile={isMobile} />
+            {featured.map((tpl) => (
+              <TemplateCard
+                key={tpl.id}
+                entry={tpl}
+                onSelect={onSelectTemplate}
+                isMobile={isMobile}
+              />
             ))}
           </div>
         </section>
@@ -1013,20 +1048,22 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
         <section style={{ ...styles.section, ...(isMobile && mobile.section) }}>
           <div style={{ ...styles.sectionHead, ...(isMobile && mobile.sectionHead) }}>
             <h2 style={styles.sectionTitle}>
-              {query.trim() ? `Results for “${query.trim()}”` : category}
+              {query.trim()
+                ? t('home.resultsFor', { query: query.trim() })
+                : t(categoryLabelKey(category))}
             </h2>
             <span style={styles.sectionHint}>
-              {filtered.length} template{filtered.length === 1 ? '' : 's'}
+              {t('home.templateCount', { count: filtered.length })}
             </span>
           </div>
           {filtered.length === 0 ? (
-            <div style={styles.empty}>Nenhum modelo encontrado. Tente outra palavra.</div>
+            <div style={styles.empty}>{t('home.noTemplatesMatch')}</div>
           ) : (
             <div style={{ ...styles.grid, ...(isMobile && mobile.grid) }}>
-              {filtered.map((t) => (
+              {filtered.map((tpl) => (
                 <TemplateCard
-                  key={t.id}
-                  entry={t}
+                  key={tpl.id}
+                  entry={tpl}
                   onSelect={onSelectTemplate}
                   isMobile={isMobile}
                 />
@@ -1041,16 +1078,16 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
           return (
             <section key={cat} style={{ ...styles.section, ...(isMobile && mobile.section) }}>
               <div style={{ ...styles.sectionHead, ...(isMobile && mobile.sectionHead) }}>
-                <h2 style={styles.sectionTitle}>{cat}</h2>
+                <h2 style={styles.sectionTitle}>{t(categoryLabelKey(cat))}</h2>
                 <span style={styles.sectionHint}>
-                  {items.length} template{items.length === 1 ? '' : 's'}
+                  {t('home.templateCount', { count: items.length })}
                 </span>
               </div>
               <div style={{ ...styles.grid, ...(isMobile && mobile.grid) }}>
-                {items.map((t) => (
+                {items.map((tpl) => (
                   <TemplateCard
-                    key={t.id}
-                    entry={t}
+                    key={tpl.id}
+                    entry={tpl}
                     onSelect={onSelectTemplate}
                     isMobile={isMobile}
                   />
@@ -1076,7 +1113,7 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
           margin: '24px auto 0',
           padding: isMobile ? '0 16px' : '0 40px',
         }}
-        aria-label="Recursos de IA em pré-lançamento"
+        aria-label={t('home.aiFeaturesPreRelease')}
       >
         <div
           style={{
@@ -1105,17 +1142,17 @@ export function Home({ onNewDocument, onSelectTemplate, onOpenFile }: HomeProps)
               flexShrink: 0,
             }}
           >
-            Pré-lançamento
+            {t('home.preRelease')}
           </span>
           <span style={{ fontSize: '13px', color: '#475569', lineHeight: 1.4 }}>
-            <strong style={{ color: '#0f172a' }}>Recursos de IA a caminho</strong>: pergunta em linha,
-            painel de reescrita e chat de DocOps.
+            <strong style={{ color: '#0f172a' }}>{t('home.aiFeaturesComingSoon')}</strong>{' '}
+            {t('home.aiFeaturesDetail')}
           </span>
         </div>
       </section>
 
       <footer style={{ ...styles.footer, ...(isMobile && mobile.footer) }}>
-        <span>Digital Door Tecnologia</span>
+        <span>{t('home.footerCredit')}</span>
       </footer>
     </div>
   );

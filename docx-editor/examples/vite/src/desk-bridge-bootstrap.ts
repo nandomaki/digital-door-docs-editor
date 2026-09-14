@@ -248,7 +248,7 @@ let dismissBoot: () => void = () => undefined;
     // Brand mark — same /logo.svg the title bar and favicon use. If it fails
     // to load (offline-build path mismatch) we just show the spinner + label.
     const mark = document.createElement('img');
-    mark.src = './logo.svg';
+    mark.src = './favicon.png';
     mark.width = 40;
     mark.height = 40;
     mark.alt = '';
